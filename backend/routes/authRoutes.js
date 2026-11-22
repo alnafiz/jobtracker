@@ -54,12 +54,10 @@ router.post("/register", async (req, res) => {
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Server error during registration",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Server error during registration",
+      error: error.message,
+    });
   }
 });
 
@@ -104,3 +102,5 @@ router.post("/login", async (req, res) => {
 });
 
 module.exports = router;
+const applicationRoutes = require("./routes/applicationRoutes"); // Application CRUD routes
+app.use("/api/applications", applicationRoutes); // Protected /api/applications endpoints
