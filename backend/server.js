@@ -7,8 +7,12 @@ const app = express(); // Express app/server instance toiri korlam
 
 app.use(cors()); // CORS middleware enable korlam
 app.use(express.json()); // JSON request body parse korar jonno
+
 const authRoutes = require("./routes/authRoutes"); // Auth routes import
 app.use("/api/auth", authRoutes); // /api/auth/register ar /api/auth/login route active holo
+
+const applicationRoutes = require("./routes/applicationRoutes"); // Application CRUD routes import
+app.use("/api/applications", applicationRoutes); // /api/applications route active holo (JWT protected)
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({ ok: true, message: "JobTracker backend is running" }); // Server health check route

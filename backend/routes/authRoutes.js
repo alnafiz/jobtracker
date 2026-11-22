@@ -102,5 +102,3 @@ router.post("/login", async (req, res) => {
 });
 
 module.exports = router;
-const applicationRoutes = require("./routes/applicationRoutes"); // Application CRUD routes
-app.use("/api/applications", applicationRoutes); // Protected /api/applications endpoints

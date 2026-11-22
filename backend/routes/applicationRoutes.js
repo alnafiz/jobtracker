@@ -4,10 +4,10 @@ const protect = require("../middleware/authMiddleware"); // JWT verification mid
 
 const router = express.Router();
 
-// Shob application route-ei JWT verification lagbe, tai router-e protect apply kora holo
+// Shob application route-ei JWT token lagbe
 router.use(protect);
 
-// GET /api/applications — Logged-in user-er shob application niye asha
+// GET /api/applications — Logged-in user-er shob application dekha
 router.get("/", async (req, res) => {
   try {
     const applications = await Application.find({ userId: req.userId }).sort({
@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST /api/applications — Notun application create kora
+// POST /api/applications — Notun application add kora
 router.post("/", async (req, res) => {
   try {
     const { company, role, status, location, jobLink, notes, appliedDate } =
@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
     }
 
     const application = await Application.create({
-      userId: req.userId, // Token theke asha verified user ID
+      userId: req.userId,
       company: company.trim(),
       role: role.trim(),
       status: status || "Applied",
@@ -59,16 +59,39 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ message: "Application not found" });
     }
 
-    // Onno user-er application jate keu edit na korte pare
     if (application.userId.toString() !== req.userId) {
       return res
         .status(403)
         .json({ message: "Not authorized to update this application" });
     }
 
+    // Shudhu permitted field-gulo pick kore update kora hocche (userId overwrite bondho)
+    const allowedUpdates = {};
+    if (req.body.company !== undefined) {
+      allowedUpdates.company = req.body.company.trim();
+    }
+    if (req.body.role !== undefined) {
+      allowedUpdates.role = req.body.role.trim();
+    }
+    if (req.body.status !== undefined) {
+      allowedUpdates.status = req.body.status;
+    }
+    if (req.body.location !== undefined) {
+      allowedUpdates.location = req.body.location.trim();
+    }
+    if (req.body.jobLink !== undefined) {
+      allowedUpdates.jobLink = req.body.jobLink.trim();
+    }
+    if (req.body.notes !== undefined) {
+      allowedUpdates.notes = req.body.notes.trim();
+    }
+    if (req.body.appliedDate !== undefined) {
+      allowedUpdates.appliedDate = req.body.appliedDate;
+    }
+
     const updatedApplication = await Application.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      allowedUpdates,
       { new: true, runValidators: true },
     );
 
